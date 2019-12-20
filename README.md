@@ -2,4 +2,4 @@
 
 Login and Signup form using firebase
 
-https://github.com/berheg/Firebase
+http://berheg.github.io/signUpFirebase
