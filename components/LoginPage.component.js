@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
-import Header from '../Header/Header.Component';
+import Header from './Header/Header.Component';
 import FormLoginRegister from './FormLoginRegister/FormLoginRegister.component';
-import imageLogin from '../../assets/images/imageLogin.jpg';
+import imageLogin from './assets/images/imageLogin.jpg';
 import FormLogin from './FormLogin/FormLogin.component';
 import './LoginPage.css';
 import './FormLoginRegister/FormLoginRegister.css';
 import FormButton from './FormButton/FormButton.component';
+import Loading from './Loading/Loading.component';
 //import app from '../../firebase/configure';
-import {auth, facebookProvider, googleProvider, twitterProvider} from '../../firebase/configure';
+import {auth, facebookProvider, googleProvider, twitterProvider} from './config/Fire';
 
 class LoginPage extends Component {
   constructor() {
@@ -45,7 +46,9 @@ class LoginPage extends Component {
   }
 
   login = (e) => {
-    this.setState({isLoading: true});
+    if(this.state.password && this.state.email){
+      this.setState({isLoading: true});
+    }    
     auth.signInWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
       this.setState({isLoading: false});
     }).catch((error) => {
@@ -95,39 +98,52 @@ onTwitterSignIn = () => {
 
     }
    })
+ }
+onTwitterSignIn = () => {
+  auth.signInWithPopup(twitterProvider)
+   .then((result, error) => {
+    if(error){
+      console.log(error)
+    }
+    else{
+
+    }
+   })
 }
   render () {
+    const { user, isLoading } = this.state;
     return (
       <div className="main-wrapper-login-page">
         <div className="header-wrapper">
           <Header title="Annotate the web" />
-          <FormLoginRegister
+          {!user && !isLoading?<FormLoginRegister
             formLoginRegister="form-login-register"
             text="Do not have account yet?"
             register="Register"
             classRegister="register-class"
             linewrapper="register-right-up-corner"
-          />
+          />:null}
         </div>
         <div className="body-wrapper">
           <div className="image-wrapper">
-            <img src={imageLogin} className="login-page-image" />
+            <img src={imageLogin} className="login-page-image" alt="disc top and pen and pencil contyainer"/>
           </div>
-          {!this.state.user?<FormLogin
+          {isLoading?<Loading />:null}
+          {!isLoading && !user?<FormLogin
             handleChange = {this.handleChange}
             login = {this.login}
             signup = {this.signup}
             onGoogleSignIn = {this.onGoogleSignIn}
             onFacebookSignIn = {this.onFacebookSignIn}
             onTwitterSignIn = {this.onTwitterSignIn} 
-          />:<FormButton
+          />:null}
+          {user?<FormButton
           title="Log Out"
           buttons="logout-btn"
           click={this.logout}
           logo=""
-        />}
-
-        </div>
+        />:null}
+        </div>        
       </div>
     );
   }
